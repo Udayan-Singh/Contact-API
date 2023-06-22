@@ -3,20 +3,22 @@ const jwt = require('jsonwebtoken');
 
 
 const validateToken = asyncHandler(async (req,res, next) => {
-    let token;
-    let authHeader = req.headers.authorization || req.headers.Authorization;
+   const token = req.cookies.access_token;
+   if(!token){
+    res.status(400);
+    res.send("Unauthorized user, please login or register beforehand");
+   }
 
-    if(authHeader && authHeader.startsWith("Bearer")) {
-        token = authHeader.split(" ")[1];
-        jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-            if(!err) {
-                res.status(401);
-                throw new Error("User is not authorized.");
-            }
+   try {
+    const data = jwt.verify(token,process.env.ACCESS_TOKEN_SECRET);
+    req.user = data;
+    
+   } catch (error) {
+    console.log(error);
+    res.sendStatus(403);
+   }
 
-            console.log(decoded);
-        });
-    }
+   return next();
 })
 
 module.exports = validateToken;

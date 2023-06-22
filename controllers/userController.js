@@ -62,6 +62,8 @@ const loginUser = asyncHandler(async (req,res) => {
             httpOnly: true,
         });
 
+        res.send("Welcome")
+
     } else{
         res.status(401);
         throw new Error("Email aur password is not valid.")
